@@ -11,7 +11,7 @@ contract Betting is Ownable {
   mapping (address => uint) private bets;
   mapping (address => uint) private rewards;
 
-  uint public playersCount;
+  uint private playersCount;
 
   event BetPlaced(address sender, uint amount);
   event AwardRecieved(address reciever, uint amount);
@@ -36,8 +36,10 @@ contract Betting is Ownable {
   function claimRewards() external {
     address player = msg.sender;
     uint reward = rewards[player] + bets[player];
+    uint comission = reward * 20 / 100;
     
-    scaleToken.transfer(player, reward);
+    scaleToken.transfer(player, reward - comission);
+    scaleToken.transfer(wallet, comission);
     
     rewards[player] = 0;
     bets[player] = 0;
@@ -45,7 +47,7 @@ contract Betting is Ownable {
     emit AwardRecieved(player, reward);
   } 
 
-  function playerWasKilled(address killer, address victim) external onlyOwner {
+  function playerKilled(address killer, address victim) external onlyOwner {
     uint reward = bets[victim] < bets[killer] ? bets[victim] : bets[killer];
     
     bets[victim] = 0;
@@ -65,5 +67,9 @@ contract Betting is Ownable {
 
   function getCurrentRewardByUser(address playerAddress) external view returns(uint) {
     return rewards[playerAddress];
+  }
+
+  function getPlayersCount() external view returns(uint) {
+    return playersCount;
   }
 }

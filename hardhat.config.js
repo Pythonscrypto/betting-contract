@@ -15,14 +15,18 @@ module.exports = {
   solidity: "0.8.4",
   networks: {
     testnet: {
-      url: "https://data-seed-prebsc-1-s1.binance.org:8545",
+      url: process.env.TESTNET_URL,
       chainId: 97,
       accounts: [process.env.PRIVATE_KEY]
     },
+    mainnet: {
+      url: process.env.MAINNET_URL,
+      accounts: [process.env.PRIVATE_KEY]
+   },
   },
   etherscan: {
     apiKey: {
-      bscTestnet: process.env.API_KEY
+      bscTestnet: process.env.API_KEY,
     }
   }
 };

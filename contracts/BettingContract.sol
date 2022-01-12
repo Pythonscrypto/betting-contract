@@ -11,24 +11,27 @@ contract Betting is Ownable {
 
   address payable wallet;
 
-  mapping (address => uint) private bets;
-  mapping (address => uint) private rewards;
+  mapping (address => uint256) private bets;
+  mapping (address => uint256) private rewards;
 
-  uint private playersCount;
+  uint256 private playersCount;
+  uint256 public taxRate = 2000;
+  uint256 public constant PCT_BASE = 10000;
 
-  event BetPlaced(address sender, uint amount);
-  event AwardRecieved(address reciever, uint amount);
+  event BetPlaced(address sender, uint256 amount);
+  event AwardReceived(address receiver, uint256 amount);
   event PLayerKilled(address killer, address victim);
 
   constructor(address payable walletAddress, address scaleTokenAddress) {
     require(walletAddress != address(0));
     require(scaleTokenAddress != address(0));
+
     playersCount = 0;
     wallet = walletAddress;
     scaleToken = IERC20(scaleTokenAddress);
   }
 
-  function newBet(uint amount) public {
+  function newBet(uint256 amount) public {
     require(amount > 0, "Bet must be greather zero.");
 
     scaleToken.safeTransferFrom(msg.sender, address(this), amount);    
@@ -41,8 +44,8 @@ contract Betting is Ownable {
   function claimRewards() external {
     address player = msg.sender;
 
-    uint reward = rewards[player] + bets[player];
-    uint comission = reward * 20 / 100;
+    uint256 reward = rewards[player] + bets[player];
+    uint256 comission = reward * taxRate / PCT_BASE;
     
     scaleToken.safeTransfer(player, reward - comission);
     scaleToken.safeTransfer(wallet, comission);
@@ -50,15 +53,15 @@ contract Betting is Ownable {
     rewards[player] = 0;
     bets[player] = 0;
 
-    emit AwardRecieved(player, reward);
+    emit AwardReceived(player, reward);
   } 
 
   function playerKilled(address killer, address victim) external onlyOwner {
     require(isPlayerInGame(killer), "Killer is not a player.");
     require(isPlayerInGame(victim), "Victim is not a player.");
 
-    uint reward = 0;
-    uint refund = 0;
+    uint256 reward = 0;
+    uint256 refund = 0;
 
     if (bets[victim] < bets[killer]) {
       reward = bets[victim];
@@ -79,18 +82,18 @@ contract Betting is Ownable {
   }
 
   function isPlayerInGame(address player) public view returns(bool) {
-    return bets[player] == 0 ? false : true;
+    return bets[player] > 0;
   } 
 
-  function getBetsByUser(address playerAddress) external view returns(uint) {
+  function getBetsByUser(address playerAddress) external view returns(uint256) {
     return bets[playerAddress];
   }
 
-  function getCurrentRewardByUser(address playerAddress) external view returns(uint) {
+  function getCurrentRewardByUser(address playerAddress) external view returns(uint256) {
     return rewards[playerAddress];
   }
 
-  function getPlayersCount() external view returns(uint) {
+  function getPlayersCount() external view returns(uint256) {
     return playersCount;
   }
 }

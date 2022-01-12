@@ -33,9 +33,8 @@ describe("Betting contract tests", async () => {
 
     const balanceAfter = await testCoin.balanceOf(address1.address);
 
-    await betting.getBetsByUser(owner.address);
     expect(balanceAfter).to.equal(balanceBefore - bet);
-    expect(await betting.getPlayersCount()).to.equal(1);
+    expect(await betting.playersCount()).to.equal(1);
   });
 
   it("Player cannot place a bet equal to zero or less", async () => {
@@ -45,7 +44,7 @@ describe("Betting contract tests", async () => {
     await testCoin.connect(address1).approve(betting.address, bet);
 
     await catchRevert(betting.connect(address1).newBet(bet));
-    expect(await betting.getPlayersCount()).to.equal(0);
+    expect(await betting.playersCount()).to.equal(0);
   });
 
   it("This case testing playerKilled function and calculation awards/bets", async () => {
@@ -63,11 +62,11 @@ describe("Betting contract tests", async () => {
 
     await betting.playerKilled(address1.address, address2.address);
 
-    expect(await betting.getCurrentRewardByUser(address1.address)).to.equal(bet2);
-    expect(await betting.getCurrentRewardByUser(address2.address)).to.equal(0);
-    expect(await betting.getBetsByUser(address2.address)).to.equal(0);
+    expect(await betting.rewards(address1.address)).to.equal(bet2);
+    expect(await betting.rewards(address2.address)).to.equal(0);
+    expect(await betting.bets(address2.address)).to.equal(0);
     expect(await betting.isPlayerInGame(address2.address)).to.equal(false);
-    expect(await betting.getPlayersCount()).to.equal(1);
+    expect(await betting.playersCount()).to.equal(1);
   });
 
   it("Player should be able to claim reward", async () => {

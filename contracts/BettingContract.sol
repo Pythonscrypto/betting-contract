@@ -11,10 +11,10 @@ contract Betting is Ownable {
 
   address payable wallet;
 
-  mapping (address => uint256) private bets;
-  mapping (address => uint256) private rewards;
+  mapping (address => uint256) public bets;
+  mapping (address => uint256) public rewards;
 
-  uint256 private playersCount;
+  uint256 public playersCount;
   uint256 public taxRate = 2000;
   uint256 public constant PCT_BASE = 10000;
 
@@ -84,16 +84,4 @@ contract Betting is Ownable {
   function isPlayerInGame(address player) public view returns(bool) {
     return bets[player] > 0;
   } 
-
-  function getBetsByUser(address playerAddress) external view returns(uint256) {
-    return bets[playerAddress];
-  }
-
-  function getCurrentRewardByUser(address playerAddress) external view returns(uint256) {
-    return rewards[playerAddress];
-  }
-
-  function getPlayersCount() external view returns(uint256) {
-    return playersCount;
-  }
 }

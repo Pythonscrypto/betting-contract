@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "npx hardhat test",
-    "deploy": "npx hardhat run --network localhost scripts/deploy.ts",
-    "cleanup": "npx hardhat cleanup"
+    "deploy": "npx hardhat run --network mainnet scripts/deploy.js",
+    "cleanup": "npx hardhat cleanup",
+    "coverage": "npx hardhat coverage"
   },
   "author": "",
   "license": "ISC",
